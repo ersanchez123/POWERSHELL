@@ -1,0 +1,1 @@
+rsync -rutvahz --stats /cygdrive/C/ /cygdrive/N/
