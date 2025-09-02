@@ -4,7 +4,7 @@
 	 Created with: 	Powershell
 	 Created on:   	Junio 2025
 	 Created by:   	Paul Chen
-	 Organization: 	Autoridad del Canal de Panama  (Edit Eric sanchez)
+	 Organization: 	Autoridad del Canal de Panama 
 	 Filename:      pwsh-mira-encendido-dev-identity.ps1
  	===========================================================================
 	.DESCRIPTION
