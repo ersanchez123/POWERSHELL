@@ -10,7 +10,7 @@ $context = Get-AzSubscription -SubscriptionId 02f2cf5d-5232-4c7b-bef3-080a3c7e1c
 Set-AzContext $context
 #endregion
 
-$resourcegroup = "vdc-eus2-rg-prd-01"
+$resourcegroup = "rg_group1"
 
 # Antes
 Get-AzVM -ResourceGroupName $resourcegroup -Status | Select-Object name,powerstate
