@@ -14,9 +14,9 @@
 #>
 
 Import-Module ExchangeOnlineManagement -ErrorAction Stop
-Connect-ExchangeOnline -UserPrincipalName cuentadmin@pancanal.com -ShowProgress $true -ErrorAction Stop
+Connect-ExchangeOnline -UserPrincipalName ernoisanchez@pancanal.com -ShowProgress $true -ErrorAction Stop
 
-$Buzon = "buzon@pancanal.com"
+$Buzon = "ACP-Empleos@pancanal.com"
 $FullAccess = Get-MailboxPermission -Identity $Buzon | Where-Object { $_.AccessRights -eq "FullAccess" } | Select-Object User, AccessRights
 $SendAS = Get-RecipientPermission -Identity $Buzon | Where-Object { $_.Trustee -ne $null -and $_.AccessRights -eq "SendAs" } | Select-Object Trustee, AccessRights
 $SendOnBehalf = (Get-Mailbox -Identity $Buzon).GrantSendOnBehalfTo | ForEach-Object { Get-Recipient $_ } | Select-Object Name
