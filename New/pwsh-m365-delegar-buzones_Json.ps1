@@ -1,9 +1,23 @@
+[CmdletBinding(SupportsShouldProcess=$true)]
+param(
+    # Ruta al JSON con los parámetros
+    [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
+    [string]$JsonPath,
+
+    # Overrides opcionales por línea de comando
+    [string]$Dominio,
+    [string]$cuenta_admin,
+    [string]$Buzon_para_delegar,
+    [string[]]$Delegados_agregar,
+    [string[]]$Delegados_eliminar
+)
 <#
 .NOTES
 ============================================================================
  Created with:    Powershell
  Created on:      Noviembre 2025
- Created by:      Paul Chen
+ Created by:      Paul Chen/Eric Sanchez
  Organization:    Autoridad del Canal de Panama
  Filename:        c:\MyRepo\mypowershell\m365\pwsh-m365-delegar-buzones.ps1
 ============================================================================
@@ -53,6 +67,7 @@
         - Uso de -WhatIf en Add-MailboxPermission y Add-RecipientPermission para operaciones de agregado por seguridad.
         - Mejor manejo de eliminaciones: relectura de permisos actuales y eliminación por entradas coincidentes.
         - Salidas más claras en consola (mensajes informativos, advertencias y errores) y códigos de salida en errores críticos.
+    2026- se modifica para leer JSON con parámetros, con fallbacks a variables de entorno y validaciones adicionales. (ERIC SANCHEZ)
 
 .EXAMPLE
     Ejecutar el script tal cual (modo seguro con -WhatIf en agregados):
@@ -98,20 +113,75 @@ function reporte_delegados {
     }
 }
 #endregion
-
 Clear-Host
 
-#region Parámetros y Variables
+#region Funciones privadas
+function Normalize-List([object]$v) {
+    if ($null -eq $v) { return @() }
+    if ($v -is [System.Collections.IEnumerable] -and -not ($v -is [string])) {
+        return @($v | ForEach-Object { $_.ToString().Trim() } | Where-Object { $_ })
+    }
+    $s = [string]$v
+    if ([string]::IsNullOrWhiteSpace($s)) { return @() }
+    return ($s -split '[,;\n]' | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+}
+
+if (-not (Test-Path -LiteralPath $JsonPath)) {
+    throw "No existe el archivo JSON: $JsonPath"
+}
+
+# 1) Carga del JSON (objeto único o arreglo -> tomamos el primero por compatibilidad)
+$raw = Get-Content -LiteralPath $JsonPath -Raw | ConvertFrom-Json
+if ($raw -is [System.Collections.IEnumerable] -and -not ($raw -is [hashtable])) {
+    $cfg = $raw[0]
+} else { $cfg = $raw }
+
+# 2) Fallbacks en este orden: Parámetro explícito > JSON > Variable de entorno > Default
+#$dominio             = $Dominio `
+#                        ?? ($env:O365_DEFAULT_DOMAIN) `
+#                        ?? "pancanal.com"
 $dominio = "pancanal.com"
-$cuenta_admin = "paulichen@$dominio"
-$buzon_para_delegar = "Gestion_De_Cobros@$dominio"
-$delegados_agregar = @("aracastrellon@$dominio")
-$delegados_eliminar = @()
+
+$cuenta_admin        = $CuentaAdmin `
+                        ?? $cfg.cuenta_admin `
+                        ?? ($env:O365_ADMIN_UPN) `
+                        ?? ("admin@" + $dominio)
+
+$buzon_para_delegar  = $BuzonParaDelegar `
+                        ?? $cfg.Buzon_para_delegar `
+                        ?? $env:O365_TARGET_MAILBOX
+
+$delegados_agregar   = if ($DelegadosAgregar) { $DelegadosAgregar } else { Normalize-List $cfg.Delegados_agregar }
+$delegados_eliminar  = if ($DelegadosEliminar) { $DelegadosEliminar } else { Normalize-List $cfg.Delegados_eliminar }
+
+# 3) Validaciones mínimas
+if ([string]::IsNullOrWhiteSpace($buzon_para_delegar)) {
+    throw "Falta 'Buzon_para_delegar' (ni parámetro, ni JSON, ni variable de entorno)."
+}
+
+# 4) Variables compuestas (se mantienen compatibles con tu script original)
+$delegados = @($delegados_agregar + $delegados_eliminar)
+
+Write-Verbose "Dominio:               $dominio"
+Write-Verbose "Cuenta admin (UPN):    $cuenta_admin"
+Write-Verbose "Buzón a delegar:       $buzon_para_delegar"
+Write-Verbose "Delegados a agregar:   $($delegados_agregar -join ', ')"
+Write-Verbose "Delegados a eliminar:  $($delegados_eliminar -join ', ')"
+
+
+#region Parámetros y Variables
+#$dominio = "pancanal.com"
+#$cuenta_admin = "paulichen@$dominio"
+#$buzon_para_delegar = "Gestion_De_Cobros@$dominio"
+#$delegados_agregar = @("aracastrellon@$dominio")
+#$delegados_eliminar = @()
 $delegados = $delegados_agregar + $delegados_eliminar
+#------------------------------------------------------
 
 Write-Host "Validando formato de correo electrónico para todas las cuentas involucradas..." -ForegroundColor Green
 # Crear lista única de direcciones a validar
 $allAccounts = @($cuenta_admin, $buzon_para_delegar) + $delegados | Select-Object -Unique
+
 
 foreach ($acct in $allAccounts) {
     if (-not (Test-EmailFormat -Email $acct)) {
