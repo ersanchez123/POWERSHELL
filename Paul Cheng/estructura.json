@@ -1,0 +1,41 @@
+{
+  "Peticion_de_servicio": "109306",
+  "Estado": "Registrado",
+  "Origen": "Autoservicio",
+
+  "Solicitado_por": {
+    "Nombre": "DTPacheco - Dagre Pacheco",
+    "Correo": "dtpacheco@pancanal.com",
+    "IP_Usuario": "2821419",
+    "Telefono_Usuario": "272-4563",
+    "Siglas_Oficina_Usuario": "OPT-1 - Unidad de Arqueo",
+    "Ubicacion_Usuario": "Edf. 729 Primer Piso, Balboa",
+    "Titulo_Usuario": "Asist de Trabajos de Oficina"
+  },
+
+  "Solicitado_para": {
+    "Nombre": "DTPacheco - Dagre Pacheco",
+    "IP_Solicitante": "2821419",
+    "Telefono_Solicitante": "272-4563",
+    "Siglas_Oficina_Solicitante": "OPT-1 - Unidad de Arqueo",
+    "Ubicacion_Solicitante": "Edf. 729 Primer Piso, Balboa",
+    "Titulo_Solicitante": "Asist de Trabajos de Oficina"
+  },
+
+  "Equipo": "SYSCLOUD - EQUIPO DE SERVICIOS DE NUBE Y PLATAFORMAS",
+  "Team_Email_Manager": "alaguerra@pancanal.com",
+  "Propietario": "NUBE Y PLATAFORMA",
+
+  "Servicio": "PETICIÓN DE SERVICIOS OFFICE 365",
+  "Categoria": "PETICIÓN DE SERVICIOS OFFICE 365",
+  "Subcategoria": "DELEGACIONES DE BUZONES COMPARTIDOS",
+
+  "Nombre_de_la_solicitud": "PLATAFORMA MICROSOFT 365",
+
+  "Descripcion": "Solicito acceso a la carpeta ACP-Shipplans@pancanal.com, OPTT-ARA@pancanal.com y OPTT-ARRP@pancanal.com para el usuario Sugamzan para desarrollo de sus funciones diarias.",
+
+  "Fecha_Creacion": "2026-02-12T07:39:00Z",
+  "Fecha_Ultima_Modificacion": "2026-02-12T10:40:00Z",
+  "Objetivo_de_respuesta": "2026-02-17T10:40:00Z",
+  "Tiempo_restante": "5 dias 0 horas"
+}
